@@ -1,3 +1,5 @@
+import { initialCards } from "./cards";
+import "../pages/index.css";
 // @todo: Темплейт карточки
 const template = document.querySelector("#card-template");
 
@@ -31,3 +33,5 @@ initialCards.forEach((card) => {
 
   placesList.appendChild(newCard);
 });
+
+console.log("Hello, World!");
