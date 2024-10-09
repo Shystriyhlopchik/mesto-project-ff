@@ -1,10 +1,10 @@
 import { initialCards } from "./cards";
 import "../pages/index.css";
-import { createCard, likeCard, removeCard } from "../components/card";
+import { viewImg, createCard, likeCard, removeCard } from "../components/card";
 import { closeModal, openModal } from "../components/modal";
 import { SELECTORS } from "../components/constants";
 
-const actionMap = [
+export const actionMap = [
   {
     selector: SELECTORS.editButton,
     action: () => openModal(popupEdit),
@@ -43,7 +43,7 @@ const pageContent = document.querySelector(".page__content");
 const fragment = document.createDocumentFragment();
 
 initialCards.forEach((card) => {
-  const newCard = createCard(card, removeCard, likeCard);
+  const newCard = createCard(card, removeCard, likeCard, viewImg);
   fragment.appendChild(newCard);
 });
 
@@ -51,6 +51,7 @@ placesList.appendChild(fragment);
 
 // @todo: прослушивание событий
 pageContent.addEventListener("click", (evt) => {
+  console.log(evt);
   const target = evt.target;
   const actionObj = actionMap.find((item) => {
     return target.matches(item.selector);
