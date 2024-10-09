@@ -1,6 +1,6 @@
 import { initialCards } from "./cards";
 import "../pages/index.css";
-import { createCard, removeCard } from "../components/card";
+import { createCard, likeCard, removeCard } from "../components/card";
 import { closeModal, openModal } from "../components/modal";
 import { SELECTORS } from "../components/constants";
 
@@ -43,7 +43,7 @@ const pageContent = document.querySelector(".page__content");
 const fragment = document.createDocumentFragment();
 
 initialCards.forEach((card) => {
-  const newCard = createCard(card, removeCard);
+  const newCard = createCard(card, removeCard, likeCard);
   fragment.appendChild(newCard);
 });
 
