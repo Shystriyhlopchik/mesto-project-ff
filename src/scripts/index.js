@@ -24,6 +24,12 @@ const actionMap = [
       closeModal(popup);
     },
   },
+  {
+    selector: SELECTORS.popup,
+    action: (target) => {
+      closeModal(target);
+    },
+  },
 ];
 
 // @todo: DOM узлы
@@ -46,10 +52,24 @@ placesList.appendChild(fragment);
 // @todo: прослушивание событий
 pageContent.addEventListener("click", (evt) => {
   const target = evt.target;
-
   const actionObj = actionMap.find((item) => {
     return target.matches(item.selector);
   });
 
-  actionObj.action(target);
+  if (actionObj) {
+    actionObj.action(target);
+  }
+});
+
+document.addEventListener("keydown", (evt) => {
+  if (evt.code === "Escape") {
+    const nodeList = pageContent.querySelectorAll(SELECTORS.popup);
+    const arrList = Array.from(nodeList);
+
+    const popup = arrList.find((item) => {
+      return item.matches(SELECTORS.popupIsOpened);
+    });
+
+    closeModal(popup);
+  }
 });

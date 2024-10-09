@@ -4,4 +4,5 @@ export const SELECTORS = {
   cardImage: ".card__image",
   closeButton: ".popup__close",
   popup: ".popup",
+  popupIsOpened: ".popup_is-opened",
 };
