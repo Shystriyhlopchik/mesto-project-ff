@@ -9,4 +9,6 @@ export const SELECTORS = {
   popupImg: ".popup__image",
   popupCaption: ".popup__caption",
   popupIsOpened: ".popup_is-opened",
+  popupTypeEdit: ".popup_type_edit",
+  popupTypeNewCard: "popup_type_new-card",
 };

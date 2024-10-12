@@ -51,7 +51,6 @@ placesList.appendChild(fragment);
 
 // @todo: прослушивание событий
 pageContent.addEventListener("click", (evt) => {
-  console.log(evt);
   const target = evt.target;
   const actionObj = actionMap.find((item) => {
     return target.matches(item.selector);
