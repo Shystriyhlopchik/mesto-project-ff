@@ -2,9 +2,25 @@ import { initialCards } from "./cards";
 import "../pages/index.css";
 import { createCard } from "../components/card";
 import { closeModal, openModal } from "../components/modal";
-import { SELECTORS } from "../components/constants";
 
-export const actionMap = [
+const SELECTORS = {
+  editButton: ".profile__edit-button",
+  addButton: ".profile__add-button",
+  cardImage: ".card__image",
+  closeButton: ".popup__close",
+  popup: ".popup",
+  popupImg: ".popup__image",
+  popupCaption: ".popup__caption",
+  placesList: ".places__list",
+  popupTypeEdit: ".popup_type_edit",
+  popupTypeNewCard: ".popup_type_new-card",
+  popupTypeImage: ".popup_type_image",
+  pageContent: ".page__content",
+  profileTitle: ".profile__title",
+  profileDescription: ".profile__description"
+};
+
+const actionMap = [
   {
     selector: SELECTORS.editButton,
     action: () => {
@@ -39,16 +55,18 @@ export const actionMap = [
   },
 ];
 
-// @todo: DOM узлы
-const placesList = document.querySelector(".places__list");
-const popupEdit = document.querySelector(".popup_type_edit");
-const popupNewCard = document.querySelector(".popup_type_new-card");
-const popupImage = document.querySelector(".popup_type_image");
-const pageContent = document.querySelector(".page__content");
-const nameElement = document.querySelector(".profile__title");
-const lessonsElement = document.querySelector(".profile__description");
+// @todo: Формы
 const editProfileForm = document.forms["edit-profile"];
 const newPlaceForm = document.forms["new-place"];
+
+// @todo: DOM узлы
+const placesList = document.querySelector(SELECTORS.placesList);
+const popupEdit = document.querySelector(SELECTORS.popupTypeEdit);
+const popupNewCard = document.querySelector(SELECTORS.popupTypeNewCard);
+const popupImage = document.querySelector(SELECTORS.popupTypeImage);
+const pageContent = document.querySelector(SELECTORS.pageContent);
+const nameElement = document.querySelector(SELECTORS.profileTitle);
+const lessonsElement = document.querySelector(SELECTORS.profileDescription);
 
 // @todo: Вывести карточки на страницу
 const fragment = document.createDocumentFragment();
