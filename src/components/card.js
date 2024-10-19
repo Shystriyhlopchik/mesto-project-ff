@@ -34,3 +34,13 @@ function getSelectors() {
 
   return { card, deleteBtn, likeBtn, cardTitle, cardImage };
 }
+
+export function removeCard(event) {
+  const item = event.target.closest(".places__item");
+
+  item.remove();
+}
+
+export function likeCard(event) {
+  event.target.classList.toggle("card__like-button_is-active");
+}

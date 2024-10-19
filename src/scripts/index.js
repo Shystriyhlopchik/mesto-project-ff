@@ -1,6 +1,6 @@
 import { initialCards } from "./cards";
 import "../pages/index.css";
-import { createCard } from "../components/card";
+import { createCard, removeCard, likeCard } from "../components/card";
 import { closeModal, openModal } from "../components/modal";
 
 const SELECTORS = {
@@ -30,11 +30,7 @@ const actionMap = [
   },
   {
     selector: SELECTORS.addButton,
-    action: () => {
-      const newPlaceForm = document.forms["new-place"];
-      newPlaceForm.addEventListener("submit", handlePlaceFormSubmit);
-      openModal(popupNewCard)
-    },
+    action: () => openModal(popupNewCard),
   },
   {
     selector: SELECTORS.cardImage,
@@ -90,6 +86,8 @@ pageContent.addEventListener("click", (evt) => {
   }
 });
 
+newPlaceForm.addEventListener("submit", handlePlaceFormSubmit);
+
 function viewImg(event, data) {
   const cardImage = document.querySelector(SELECTORS.popupImg);
   const popupCaption = document.querySelector(SELECTORS.popupCaption);
@@ -102,16 +100,6 @@ function viewImg(event, data) {
   popupCaption.textContent = data.name;
 
   actionItem.action();
-}
-
-function removeCard(event) {
-  const item = event.target.closest(".places__item");
-
-  item.remove();
-}
-
-function likeCard(event) {
-  event.target.classList.toggle("card__like-button_is-active");
 }
 
 function handleProfileFormSubmit(evt) {

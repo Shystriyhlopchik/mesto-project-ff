@@ -5,16 +5,11 @@ export function openModal(modal) {
 
 export function closeModal(modal) {
   document.removeEventListener("keydown", closeByEscape);
-  closePopup(modal);
+  modal.classList.remove("popup_is-opened");
 }
 
 function closeByEscape(event) {
   if(event.key === 'Escape') {
-     closePopup(document.querySelector('.popup_is-opened'));
+     closeModal(document.querySelector('.popup_is-opened'));
   }
-}
-
-function closePopup(event) {
-  document.removeEventListener("keydown", closeByEscape);
-  event.classList.remove("popup_is-opened");
 }
