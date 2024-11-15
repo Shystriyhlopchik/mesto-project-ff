@@ -2,6 +2,7 @@ import { initialCards } from "./cards";
 import "../pages/index.css";
 import { createCard, removeCard, likeCard } from "../components/card";
 import { closeModal, openModal } from "../components/modal";
+import { enableValidation } from "../components/validation";
 
 const SELECTORS = {
   editButton: ".profile__edit-button",
@@ -17,7 +18,16 @@ const SELECTORS = {
   popupTypeImage: ".popup_type_image",
   pageContent: ".page__content",
   profileTitle: ".profile__title",
-  profileDescription: ".profile__description"
+  profileDescription: ".profile__description",
+};
+
+const settings = {
+  formSelector: ".popup__form",
+  inputSelector: ".popup__input",
+  submitButtonSelector: ".popup__button",
+  inactiveButtonClass: "popup__button_disabled",
+  inputErrorClass: "popup__input_type_error",
+  errorClass: "popup__error_visible",
 };
 
 const actionMap = [
@@ -120,9 +130,8 @@ function handleProfileFormSubmit(evt) {
   closeModal(evt.target.closest(SELECTORS.popup));
 }
 
-
 function populateEditProfileForm() {
-  editProfileForm.name.value = nameElement.textContent; 
+  editProfileForm.name.value = nameElement.textContent;
   editProfileForm.description.value = lessonsElement.textContent;
 
   editProfileForm.addEventListener("submit", handleProfileFormSubmit);
@@ -149,3 +158,5 @@ function handlePlaceFormSubmit(evt) {
   newPlaceForm.reset();
   closeModal(evt.target.closest(SELECTORS.popup));
 }
+
+enableValidation(settings);
