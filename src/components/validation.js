@@ -47,6 +47,12 @@ function hasInvalidInput(inputList) {
 }
 
 const checkInputValidity = (formElement, inputElement, selectors) => {
+  if (inputElement.validity.patternMismatch) {
+    inputElement.setCustomValidity(inputElement.dataset.errorMessage);
+  } else {
+    inputElement.setCustomValidity("");
+  }
+
   if (!inputElement.validity.valid) {
     showInputError(
       formElement,
