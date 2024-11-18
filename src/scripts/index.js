@@ -35,16 +35,16 @@ const actionMap = [
     selector: SELECTORS.editButton,
     action: () => {
       populateEditProfileForm();
-      openModal(popupEdit);
+      openModal(popupEdit, settings);
     },
   },
   {
     selector: SELECTORS.addButton,
-    action: () => openModal(popupNewCard),
+    action: () => openModal(popupNewCard, settings),
   },
   {
     selector: SELECTORS.cardImage,
-    action: () => openModal(popupImage),
+    action: () => openModal(popupImage, settings),
   },
   {
     selector: SELECTORS.closeButton,
