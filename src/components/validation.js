@@ -12,7 +12,21 @@ export function enableValidation(selectors) {
   });
 }
 
-export function clearValidation() {}
+export function clearValidation(profileForm, validationConfig) {
+  const buttonElement = profileForm.querySelector(
+    validationConfig.submitButtonSelector,
+  );
+
+  const inputList = Array.from(
+    profileForm.querySelectorAll(validationConfig.inputSelector),
+  );
+
+  inputList.forEach((inputElement) => {
+    hideInputError(profileForm, inputElement, validationConfig);
+  });
+
+  toggleButtonState(inputList, buttonElement, validationConfig);
+}
 
 const setEventListeners = (formElement, selectors) => {
   const inputList = Array.from(
