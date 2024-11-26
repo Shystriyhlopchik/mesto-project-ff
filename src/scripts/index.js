@@ -1,8 +1,8 @@
-import { initialCards } from "./cards";
 import "../pages/index.css";
 import { createCard, removeCard, likeCard } from "../components/card";
 import { closeModal, openModal } from "../components/modal";
 import { enableValidation } from "../components/validation";
+import { getListCards, getUserInformation } from "../components/api";
 
 const SELECTORS = {
   editButton: ".profile__edit-button",
@@ -77,12 +77,20 @@ const lessonsElement = document.querySelector(SELECTORS.profileDescription);
 // @todo: Вывести карточки на страницу
 const fragment = document.createDocumentFragment();
 
-initialCards.forEach((card) => {
-  const newCard = createCard(card, removeCard, likeCard, viewImg);
-  fragment.appendChild(newCard);
+Promise.all([getListCards(), getUserInformation()]).then(([cards, user]) => {
+  console.log(cards, user)``;
 });
-
-placesList.appendChild(fragment);
+// getListCards()
+//   .then((cards) => {
+//     cards.forEach((card) => {
+//       const newCard = createCard(card, removeCard, likeCard, viewImg);
+//       fragment.appendChild(newCard);
+//     });
+//     return fragment;
+//   })
+//   .then((fragment) => {
+//     placesList.appendChild(fragment);
+//   });
 
 // @todo: прослушивание событий
 pageContent.addEventListener("click", (evt) => {
