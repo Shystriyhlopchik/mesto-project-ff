@@ -2,7 +2,12 @@ import "../pages/index.css";
 import { createCard, removeCard, likeCard } from "../components/card";
 import { closeModal, openModal } from "../components/modal";
 import { enableValidation } from "../components/validation";
-import { getListCards, getUserInformation } from "../components/api";
+import {
+  addNewCard,
+  getListCards,
+  getUserInformation,
+  updateUserProfile,
+} from "../components/api";
 
 const SELECTORS = {
   editButton: ".profile__edit-button",
@@ -19,6 +24,7 @@ const SELECTORS = {
   pageContent: ".page__content",
   profileTitle: ".profile__title",
   profileDescription: ".profile__description",
+  profileImage: ".profile__image",
 };
 
 const settings = {
@@ -73,24 +79,24 @@ const popupImage = document.querySelector(SELECTORS.popupTypeImage);
 const pageContent = document.querySelector(SELECTORS.pageContent);
 const nameElement = document.querySelector(SELECTORS.profileTitle);
 const lessonsElement = document.querySelector(SELECTORS.profileDescription);
+const imgElement = document.querySelector(SELECTORS.profileImage);
 
 // @todo: Вывести карточки на страницу
 const fragment = document.createDocumentFragment();
 
-Promise.all([getListCards(), getUserInformation()]).then(([cards, user]) => {
-  console.log(cards, user)``;
-});
-// getListCards()
-//   .then((cards) => {
-//     cards.forEach((card) => {
-//       const newCard = createCard(card, removeCard, likeCard, viewImg);
-//       fragment.appendChild(newCard);
-//     });
-//     return fragment;
-//   })
-//   .then((fragment) => {
-//     placesList.appendChild(fragment);
-//   });
+Promise.all([getListCards(), getUserInformation()])
+  .then(([cards, user]) => {
+    cards.forEach((card) => {
+      const newCard = createCard(card, removeCard, likeCard, viewImg);
+      fragment.appendChild(newCard);
+    });
+
+    return { fragment, user };
+  })
+  .then(({ fragment, user }) => {
+    populateUserProfile(user);
+    placesList.appendChild(fragment);
+  });
 
 // @todo: прослушивание событий
 pageContent.addEventListener("click", (evt) => {
@@ -135,6 +141,7 @@ function handleProfileFormSubmit(evt) {
   nameElement.textContent = nameValue;
   lessonsElement.textContent = jobValue;
 
+  updateUserProfile(nameValue, jobValue);
   closeModal(evt.target.closest(SELECTORS.popup));
 }
 
@@ -150,6 +157,7 @@ function handlePlaceFormSubmit(evt) {
   const placeNameVal = newPlaceForm["place-name"].value;
   const linkVal = newPlaceForm["link"].value;
 
+  addNewCard(placeNameVal, linkVal);
   const newCard = createCard(
     {
       name: placeNameVal,
@@ -165,6 +173,13 @@ function handlePlaceFormSubmit(evt) {
 
   newPlaceForm.reset();
   closeModal(evt.target.closest(SELECTORS.popup));
+}
+
+function populateUserProfile(user) {
+  console.log(user.avatar);
+  nameElement.textContent = user.name;
+  lessonsElement.textContent = user.about;
+  imgElement.style = `background-image: url('${user.avatar}')`;
 }
 
 enableValidation(settings);
