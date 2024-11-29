@@ -11,11 +11,16 @@ const SELECTORS = {
 // @todo: Темплейт карточки
 const template = document.querySelector(SELECTORS.cardTemplate);
 
-export function createCard(data, removeCard, likeCard, viewImg) {
+export function createCard(data, removeCard, likeCard, viewImg, userId) {
   const { card, deleteBtn, likeBtn, cardTitle, cardImage, cardLikeCount } =
     getSelectors();
 
-  deleteBtn.addEventListener("click", removeCard);
+  if (data.owner["_id"] === userId) {
+    deleteBtn.addEventListener("click", removeCard);
+  } else {
+    deleteBtn.classList.add("card__delete-button_hidden");
+  }
+
   likeBtn.addEventListener("click", likeCard);
   cardImage.addEventListener("click", (event) => {
     viewImg(event, data);

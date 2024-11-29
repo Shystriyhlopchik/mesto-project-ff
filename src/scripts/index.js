@@ -1,7 +1,7 @@
 import "../pages/index.css";
 import { createCard, removeCard, likeCard } from "../components/card";
 import { closeModal, openModal } from "../components/modal";
-import { enableValidation } from "../components/validation";
+import { clearValidation, enableValidation } from "../components/validation";
 import {
   addNewCard,
   getListCards,
@@ -38,21 +38,6 @@ const settings = {
 
 const actionMap = [
   {
-    selector: SELECTORS.editButton,
-    action: () => {
-      populateEditProfileForm();
-      openModal(popupEdit, settings);
-    },
-  },
-  {
-    selector: SELECTORS.addButton,
-    action: () => openModal(popupNewCard, settings),
-  },
-  {
-    selector: SELECTORS.cardImage,
-    action: () => openModal(popupImage, settings),
-  },
-  {
     selector: SELECTORS.closeButton,
     action: (target) => {
       const popup = target.closest(SELECTORS.popup);
@@ -80,14 +65,18 @@ const pageContent = document.querySelector(SELECTORS.pageContent);
 const nameElement = document.querySelector(SELECTORS.profileTitle);
 const lessonsElement = document.querySelector(SELECTORS.profileDescription);
 const imgElement = document.querySelector(SELECTORS.profileImage);
+const profileEditBtn = document.querySelector(SELECTORS.editButton);
+const addBtn = document.querySelector(SELECTORS.addButton);
 
 // @todo: Вывести карточки на страницу
 const fragment = document.createDocumentFragment();
 
 Promise.all([getListCards(), getUserInformation()])
   .then(([cards, user]) => {
+    const userId = user["_id"];
+
     cards.forEach((card) => {
-      const newCard = createCard(card, removeCard, likeCard, viewImg);
+      const newCard = createCard(card, removeCard, likeCard, viewImg, userId);
       fragment.appendChild(newCard);
     });
 
@@ -110,20 +99,27 @@ pageContent.addEventListener("click", (evt) => {
   }
 });
 
+// @todo: Прослушивание клика по кнопке редактирования пользователя
+profileEditBtn.addEventListener("click", () => {
+  populateEditProfileForm();
+  clearValidation(popupEdit, settings);
+  openModal(popupEdit, settings);
+});
+
+// @todo: Прослушивание клика по добавлению новой карточки
+addBtn.addEventListener("click", () => {
+  openModal(popupNewCard, settings);
+});
+
 newPlaceForm.addEventListener("submit", handlePlaceFormSubmit);
 
 function viewImg(event, data) {
   const cardImage = document.querySelector(SELECTORS.popupImg);
   const popupCaption = document.querySelector(SELECTORS.popupCaption);
 
-  const actionItem = actionMap.find((item) => {
-    return item.selector === SELECTORS.cardImage;
-  });
-
   cardImage.setAttribute("src", data.link);
   popupCaption.textContent = data.name;
-
-  actionItem.action();
+  openModal(popupImage, settings);
 }
 
 function handleProfileFormSubmit(evt) {
@@ -154,6 +150,7 @@ function populateEditProfileForm() {
 
 function handlePlaceFormSubmit(evt) {
   evt.preventDefault();
+
   const placeNameVal = newPlaceForm["place-name"].value;
   const linkVal = newPlaceForm["link"].value;
 
@@ -176,7 +173,6 @@ function handlePlaceFormSubmit(evt) {
 }
 
 function populateUserProfile(user) {
-  console.log(user.avatar);
   nameElement.textContent = user.name;
   lessonsElement.textContent = user.about;
   imgElement.style = `background-image: url('${user.avatar}')`;
