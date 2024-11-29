@@ -87,7 +87,7 @@ Promise.all([getListCards(), getUserInformation()])
     placesList.appendChild(fragment);
   });
 
-// @todo: прослушивание событий
+// @todo: прослушивание событий(отвечает исключительно за закрытие)
 pageContent.addEventListener("click", (evt) => {
   const target = evt.target;
   const actionObj = actionMap.find((item) => {

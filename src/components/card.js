@@ -1,3 +1,5 @@
+import { deleteCard } from "./api";
+
 const SELECTORS = {
   card: ".card",
   cardDeleteButton: ".card__delete-button",
@@ -16,7 +18,10 @@ export function createCard(data, removeCard, likeCard, viewImg, userId) {
     getSelectors();
 
   if (data.owner["_id"] === userId) {
-    deleteBtn.addEventListener("click", removeCard);
+    deleteBtn.addEventListener("click", (event) => {
+      const cardId = data["_id"];
+      removeCard(event, cardId);
+    });
   } else {
     deleteBtn.classList.add("card__delete-button_hidden");
   }
@@ -44,8 +49,10 @@ function getSelectors() {
   return { card, deleteBtn, likeBtn, cardTitle, cardImage, cardLikeCount };
 }
 
-export function removeCard(event) {
+export function removeCard(event, cardId) {
   const item = event.target.closest(".places__item");
+
+  deleteCard(cardId);
 
   item.remove();
 }

@@ -28,6 +28,13 @@ function post(url, params) {
   });
 }
 
+function dlt(cardId) {
+  return fetch(config.baseUrl + `/cards/${cardId}`, {
+    method: "DELETE",
+    headers: config.headers,
+  });
+}
+
 /**
  * Функция получения списка карточек
  * @return { Promise }
@@ -94,6 +101,24 @@ export function addNewCard(name, link) {
   const params = { name, link };
 
   post("cards", params)
+    .then((res) => {
+      if (res.ok) {
+        return res.json();
+      }
+
+      return Promise.reject(`Ошибка: ${res.status}`);
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+}
+
+/**
+ * удаление карточки
+ * @param { string } cardId ID удаляемой карточки
+ */
+export function deleteCard(cardId) {
+  dlt(cardId)
     .then((res) => {
       if (res.ok) {
         return res.json();
