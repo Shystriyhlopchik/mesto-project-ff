@@ -28,9 +28,16 @@ function post(url, params) {
   });
 }
 
-function dlt(cardId) {
-  return fetch(config.baseUrl + `/cards/${cardId}`, {
+function dlt(url, cardId) {
+  return fetch(config.baseUrl + `/${url}/${cardId}`, {
     method: "DELETE",
+    headers: config.headers,
+  });
+}
+
+function put(url, cardId) {
+  return fetch(config.baseUrl + `/${url}/${cardId}`, {
+    method: "PUT",
     headers: config.headers,
   });
 }
@@ -115,10 +122,48 @@ export function addNewCard(name, link) {
 
 /**
  * удаление карточки
- * @param { string } cardId ID удаляемой карточки
+ * @param { number } cardId ID удаляемой карточки
  */
 export function deleteCard(cardId) {
-  dlt(cardId)
+  dlt("cards", cardId)
+    .then((res) => {
+      if (res.ok) {
+        return res.json();
+      }
+
+      return Promise.reject(`Ошибка: ${res.status}`);
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+}
+
+/**
+ * добавление лайка
+ * @param { number } cardId ID карточки
+ * @return { Promise }
+ */
+export function addLikeCard(cardId) {
+  return put("cards/likes/", cardId)
+    .then((res) => {
+      if (res.ok) {
+        return res.json();
+      }
+
+      return Promise.reject(`Ошибка: ${res.status}`);
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+}
+
+/**
+ * удаление лайка
+ * @param { number } cardId ID карточки
+ * @return { Promise }
+ */
+export function removeLikeCard(cardId) {
+  return dlt("cards/likes/", cardId)
     .then((res) => {
       if (res.ok) {
         return res.json();
