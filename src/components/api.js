@@ -82,11 +82,12 @@ export function getUserInformation() {
  * редактирование профиля пользователя
  * @param { string } name Имя пользователя
  * @param { string } job Занятия пользователя
+ * @return { Promise }
  */
-export function updateUserProfile(name, job) {
+export async function updateUserProfile(name, job) {
   const params = { name, about: job };
 
-  patch("users/me", params)
+  return patch("users/me", params)
     .then((res) => {
       if (res.ok) {
         return res.json();
@@ -103,11 +104,12 @@ export function updateUserProfile(name, job) {
  * редактирование профиля пользователя
  * @param { string } name Название изображения
  * @param { string } link Ссылка на изображение
+ * @return { Promise }
  */
-export function addNewCard(name, link) {
+export async function addNewCard(name, link) {
   const params = { name, link };
 
-  post("cards", params)
+  return post("cards", params)
     .then((res) => {
       if (res.ok) {
         return res.json();

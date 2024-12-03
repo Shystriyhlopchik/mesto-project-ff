@@ -27,6 +27,7 @@ const SELECTORS = {
   profileDescription: ".profile__description",
   profileImage: ".profile__image",
   popupAvatar: ".popup_type_avatar",
+  popupButton: ".popup__button",
 };
 
 const settings = {
@@ -141,61 +142,85 @@ function populateEditProfileForm() {
 }
 
 function handleProfileFormSubmit(evt) {
+  console.log(evt.target);
   const formElement = document.querySelector(".popup__form");
   const nameElement = document.querySelector(".profile__title");
   const lessonsElement = document.querySelector(".profile__description");
   const nameInput = formElement.querySelector(".popup__input_type_name");
   const jobInput = formElement.querySelector(".popup__input_type_description");
+  const btn = evt.target.querySelector(SELECTORS.popupButton);
 
   evt.preventDefault();
+
+  renderLoading(true, btn);
 
   const nameValue = nameInput.value;
   const jobValue = jobInput.value;
 
-  nameElement.textContent = nameValue;
-  lessonsElement.textContent = jobValue;
-
-  updateUserProfile(nameValue, jobValue);
-  closeModal(evt.target.closest(SELECTORS.popup));
+  updateUserProfile(nameValue, jobValue)
+    .then(() => {
+      nameElement.textContent = nameValue;
+      lessonsElement.textContent = jobValue;
+    })
+    .finally(() => {
+      renderLoading(false, btn);
+      closeModal(evt.target.closest(SELECTORS.popup));
+    });
 }
 
 function handlePlaceFormSubmit(evt) {
   evt.preventDefault();
 
+  const btn = evt.target.querySelector(SELECTORS.popupButton);
   const placeNameVal = newPlaceForm["place-name"].value;
   const linkVal = newPlaceForm["link"].value;
 
-  addNewCard(placeNameVal, linkVal);
-  const newCard = createCard(
-    {
-      name: placeNameVal,
-      link: linkVal,
-    },
-    removeCard,
-    likeCard,
-    viewImg,
-  );
+  renderLoading(true, btn);
+  addNewCard(placeNameVal, linkVal)
+    .then(() => {
+      const newCard = createCard(
+        {
+          name: placeNameVal,
+          link: linkVal,
+        },
+        removeCard,
+        likeCard,
+        viewImg,
+      );
 
-  const placesList = document.querySelector(".places__list");
-  placesList.insertBefore(newCard, placesList.firstChild);
+      const placesList = document.querySelector(".places__list");
 
-  newPlaceForm.reset();
-  closeModal(evt.target.closest(SELECTORS.popup));
+      placesList.insertBefore(newCard, placesList.firstChild);
+      newPlaceForm.reset();
+    })
+    .finally(() => {
+      renderLoading(false, btn);
+      closeModal(evt.target.closest(SELECTORS.popup));
+    });
 }
 
 function handleAvatarFormSubmit(evt) {
+  const btn = evt.target.querySelector(SELECTORS.popupButton);
   const urlAvatar = editAvatarForm["link"].value;
 
-  updateAvatar(urlAvatar).then((user) => {
-    populateUserProfile(user);
-    closeModal(evt.target.closest(SELECTORS.popup));
-  });
+  updateAvatar(urlAvatar)
+    .then((user) => {
+      populateUserProfile(user);
+      closeModal(evt.target.closest(SELECTORS.popup));
+    })
+    .finally(() => {
+      renderLoading(false, btn);
+    });
 }
 
 function populateUserProfile(user) {
   nameElement.textContent = user.name;
   lessonsElement.textContent = user.about;
   imgElement.style = `background-image: url('${user.avatar}')`;
+}
+
+function renderLoading(isLoading, button) {
+  button.textContent = isLoading ? "Сохранение..." : "Сохранить";
 }
 
 enableValidation(settings);

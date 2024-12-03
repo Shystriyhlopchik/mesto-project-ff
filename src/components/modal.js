@@ -1,8 +1,6 @@
 import { clearValidation } from "./validation";
 
 export function openModal(modal, settings) {
-  // clearValidation(modal, settings);
-  console.log(modal);
   modal.classList.add("popup_is-opened");
   document.addEventListener("keydown", closeByEscape);
 }
