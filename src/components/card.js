@@ -18,19 +18,26 @@ export function createCard(data, removeCard, likeCard, viewImg, userId) {
     getSelectors();
   const cardId = data["_id"];
 
-  const like = data.likes.find((item) => {
-    return item["_id"] === userId;
-  });
-  if (like) {
-    likeBtn.classList.add("card__like-button_is-active");
+  if ("likes" in data) {
+    const like = data.likes.find((item) => {
+      return item["_id"] === userId;
+    });
+
+    if (like) {
+      likeBtn.classList.add("card__like-button_is-active");
+    }
+
+    cardLikeCount.textContent = data.likes.length;
   }
 
-  if (data.owner["_id"] === userId) {
-    deleteBtn.addEventListener("click", (event) => {
-      removeCard(event, cardId);
-    });
-  } else {
-    deleteBtn.classList.add("card__delete-button_hidden");
+  if ("owner" in data) {
+    if (data.owner["_id"] === userId) {
+      deleteBtn.addEventListener("click", (event) => {
+        removeCard(event, cardId);
+      });
+    } else {
+      deleteBtn.classList.add("card__delete-button_hidden");
+    }
   }
 
   likeBtn.addEventListener("click", (event) => {
@@ -42,7 +49,6 @@ export function createCard(data, removeCard, likeCard, viewImg, userId) {
 
   cardTitle.textContent = data.name;
   cardImage.src = data.link;
-  cardLikeCount.textContent = data.likes.length;
 
   return card;
 }

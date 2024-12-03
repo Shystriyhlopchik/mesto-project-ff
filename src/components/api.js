@@ -6,13 +6,13 @@ const config = {
   },
 };
 
-function get(url) {
+async function get(url) {
   return fetch(config.baseUrl + `/${url}`, {
     headers: config.headers,
   });
 }
 
-function patch(url, params) {
+async function patch(url, params) {
   return fetch(config.baseUrl + `/${url}`, {
     method: "PATCH",
     headers: config.headers,
@@ -20,7 +20,7 @@ function patch(url, params) {
   });
 }
 
-function post(url, params) {
+async function post(url, params) {
   return fetch(config.baseUrl + `/${url}`, {
     method: "POST",
     headers: config.headers,
@@ -28,14 +28,14 @@ function post(url, params) {
   });
 }
 
-function dlt(url, cardId) {
+async function dlt(url, cardId) {
   return fetch(config.baseUrl + `/${url}/${cardId}`, {
     method: "DELETE",
     headers: config.headers,
   });
 }
 
-function put(url, cardId) {
+async function put(url, cardId) {
   return fetch(config.baseUrl + `/${url}/${cardId}`, {
     method: "PUT",
     headers: config.headers,
@@ -46,7 +46,7 @@ function put(url, cardId) {
  * Функция получения списка карточек
  * @return { Promise }
  */
-export function getListCards() {
+export async function getListCards() {
   return get("cards")
     .then((res) => {
       if (res.ok) {
@@ -143,7 +143,7 @@ export function deleteCard(cardId) {
  * @param { number } cardId ID карточки
  * @return { Promise }
  */
-export function addLikeCard(cardId) {
+export async function addLikeCard(cardId) {
   return put("cards/likes/", cardId)
     .then((res) => {
       if (res.ok) {
@@ -162,8 +162,29 @@ export function addLikeCard(cardId) {
  * @param { number } cardId ID карточки
  * @return { Promise }
  */
-export function removeLikeCard(cardId) {
+export async function removeLikeCard(cardId) {
   return dlt("cards/likes/", cardId)
+    .then((res) => {
+      if (res.ok) {
+        return res.json();
+      }
+
+      return Promise.reject(`Ошибка: ${res.status}`);
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+}
+
+/**
+ * Обновление аватара пользователя
+ * @param { string } avatar ссылка на аватар пользователя
+ * @return { Promise }
+ */
+export async function updateAvatar(avatar) {
+  const params = { avatar };
+
+  return patch("users/me/avatar", params)
     .then((res) => {
       if (res.ok) {
         return res.json();

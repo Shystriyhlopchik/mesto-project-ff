@@ -6,6 +6,7 @@ import {
   addNewCard,
   getListCards,
   getUserInformation,
+  updateAvatar,
   updateUserProfile,
 } from "../components/api";
 
@@ -25,6 +26,7 @@ const SELECTORS = {
   profileTitle: ".profile__title",
   profileDescription: ".profile__description",
   profileImage: ".profile__image",
+  popupAvatar: ".popup_type_avatar",
 };
 
 const settings = {
@@ -55,6 +57,7 @@ const actionMap = [
 // @todo: Формы
 const editProfileForm = document.forms["edit-profile"];
 const newPlaceForm = document.forms["new-place"];
+const editAvatarForm = document.forms["edit-avatar"];
 
 // @todo: DOM узлы
 const placesList = document.querySelector(SELECTORS.placesList);
@@ -67,6 +70,7 @@ const lessonsElement = document.querySelector(SELECTORS.profileDescription);
 const imgElement = document.querySelector(SELECTORS.profileImage);
 const profileEditBtn = document.querySelector(SELECTORS.editButton);
 const addBtn = document.querySelector(SELECTORS.addButton);
+const popupAvatar = document.querySelector(SELECTORS.popupAvatar);
 
 // @todo: Вывести карточки на страницу
 const fragment = document.createDocumentFragment();
@@ -111,7 +115,14 @@ addBtn.addEventListener("click", () => {
   openModal(popupNewCard, settings);
 });
 
+imgElement.addEventListener("click", () => {
+  clearValidation(popupAvatar, settings);
+  editAvatarForm.reset();
+  openModal(popupAvatar, settings);
+});
+
 newPlaceForm.addEventListener("submit", handlePlaceFormSubmit);
+editAvatarForm.addEventListener("submit", handleAvatarFormSubmit);
 
 function viewImg(event, data) {
   const cardImage = document.querySelector(SELECTORS.popupImg);
@@ -120,6 +131,13 @@ function viewImg(event, data) {
   cardImage.setAttribute("src", data.link);
   popupCaption.textContent = data.name;
   openModal(popupImage, settings);
+}
+
+function populateEditProfileForm() {
+  editProfileForm.name.value = nameElement.textContent;
+  editProfileForm.description.value = lessonsElement.textContent;
+
+  editProfileForm.addEventListener("submit", handleProfileFormSubmit);
 }
 
 function handleProfileFormSubmit(evt) {
@@ -139,13 +157,6 @@ function handleProfileFormSubmit(evt) {
 
   updateUserProfile(nameValue, jobValue);
   closeModal(evt.target.closest(SELECTORS.popup));
-}
-
-function populateEditProfileForm() {
-  editProfileForm.name.value = nameElement.textContent;
-  editProfileForm.description.value = lessonsElement.textContent;
-
-  editProfileForm.addEventListener("submit", handleProfileFormSubmit);
 }
 
 function handlePlaceFormSubmit(evt) {
@@ -170,6 +181,15 @@ function handlePlaceFormSubmit(evt) {
 
   newPlaceForm.reset();
   closeModal(evt.target.closest(SELECTORS.popup));
+}
+
+function handleAvatarFormSubmit(evt) {
+  const urlAvatar = editAvatarForm["link"].value;
+
+  updateAvatar(urlAvatar).then((user) => {
+    populateUserProfile(user);
+    closeModal(evt.target.closest(SELECTORS.popup));
+  });
 }
 
 function populateUserProfile(user) {
