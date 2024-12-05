@@ -49,6 +49,7 @@ export function createCard(data, removeCard, likeCard, viewImg, userId) {
 
   cardTitle.textContent = data.name;
   cardImage.src = data.link;
+  cardImage.alt = data.name;
 
   return card;
 }
@@ -67,7 +68,9 @@ function getSelectors() {
 export function removeCard(event, cardId) {
   const item = event.target.closest(".places__item");
 
-  deleteCard(cardId);
+  deleteCard(cardId).catch((err) => {
+    console.log(err);
+  });
 
   item.remove();
 }
@@ -76,14 +79,22 @@ export function likeCard(event, cardId, data, cardLikeCount) {
   const res = event.target.classList.toggle("card__like-button_is-active");
 
   if (res) {
-    addLikeCard(cardId).then((res) => {
-      data.likes = [...res.likes];
-      cardLikeCount.textContent = data.likes.length;
-    });
+    addLikeCard(cardId)
+      .then((res) => {
+        data.likes = [...res.likes];
+        cardLikeCount.textContent = data.likes.length;
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   } else {
-    removeLikeCard(cardId).then((res) => {
-      data.likes = [...res.likes];
-      cardLikeCount.textContent = data.likes.length;
-    });
+    removeLikeCard(cardId)
+      .then((res) => {
+        data.likes = [...res.likes];
+        cardLikeCount.textContent = data.likes.length;
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   }
 }

@@ -72,6 +72,11 @@ const imgElement = document.querySelector(SELECTORS.profileImage);
 const profileEditBtn = document.querySelector(SELECTORS.editButton);
 const addBtn = document.querySelector(SELECTORS.addButton);
 const popupAvatar = document.querySelector(SELECTORS.popupAvatar);
+const cardImage = document.querySelector(SELECTORS.popupImg);
+const popupCaption = document.querySelector(SELECTORS.popupCaption);
+const formElement = document.querySelector(".popup__form");
+const nameInput = formElement.querySelector(".popup__input_type_name");
+const jobInput = formElement.querySelector(".popup__input_type_description");
 
 // @todo: Вывести карточки на страницу
 const fragment = document.createDocumentFragment();
@@ -90,6 +95,9 @@ Promise.all([getListCards(), getUserInformation()])
   .then(({ fragment, user }) => {
     populateUserProfile(user);
     placesList.appendChild(fragment);
+  })
+  .catch((err) => {
+    console.log(err);
   });
 
 // @todo: прослушивание событий(отвечает исключительно за закрытие)
@@ -124,12 +132,11 @@ imgElement.addEventListener("click", () => {
 
 newPlaceForm.addEventListener("submit", handlePlaceFormSubmit);
 editAvatarForm.addEventListener("submit", handleAvatarFormSubmit);
+editProfileForm.addEventListener("submit", handleProfileFormSubmit);
 
 function viewImg(event, data) {
-  const cardImage = document.querySelector(SELECTORS.popupImg);
-  const popupCaption = document.querySelector(SELECTORS.popupCaption);
-
   cardImage.setAttribute("src", data.link);
+  cardImage.setAttribute("alt", data.name);
   popupCaption.textContent = data.name;
   openModal(popupImage, settings);
 }
@@ -137,17 +144,9 @@ function viewImg(event, data) {
 function populateEditProfileForm() {
   editProfileForm.name.value = nameElement.textContent;
   editProfileForm.description.value = lessonsElement.textContent;
-
-  editProfileForm.addEventListener("submit", handleProfileFormSubmit);
 }
 
 function handleProfileFormSubmit(evt) {
-  console.log(evt.target);
-  const formElement = document.querySelector(".popup__form");
-  const nameElement = document.querySelector(".profile__title");
-  const lessonsElement = document.querySelector(".profile__description");
-  const nameInput = formElement.querySelector(".popup__input_type_name");
-  const jobInput = formElement.querySelector(".popup__input_type_description");
   const btn = evt.target.querySelector(SELECTORS.popupButton);
 
   evt.preventDefault();
@@ -158,13 +157,16 @@ function handleProfileFormSubmit(evt) {
   const jobValue = jobInput.value;
 
   updateUserProfile(nameValue, jobValue)
-    .then(() => {
-      nameElement.textContent = nameValue;
-      lessonsElement.textContent = jobValue;
+    .then((res) => {
+      nameElement.textContent = res.name;
+      lessonsElement.textContent = res.about;
+      closeModal(evt.target.closest(SELECTORS.popup));
+    })
+    .catch((err) => {
+      console.log(err);
     })
     .finally(() => {
       renderLoading(false, btn);
-      closeModal(evt.target.closest(SELECTORS.popup));
     });
 }
 
@@ -191,11 +193,14 @@ function handlePlaceFormSubmit(evt) {
       const placesList = document.querySelector(".places__list");
 
       placesList.insertBefore(newCard, placesList.firstChild);
+      closeModal(evt.target.closest(SELECTORS.popup));
       newPlaceForm.reset();
+    })
+    .catch((err) => {
+      console.log(err);
     })
     .finally(() => {
       renderLoading(false, btn);
-      closeModal(evt.target.closest(SELECTORS.popup));
     });
 }
 
@@ -207,6 +212,9 @@ function handleAvatarFormSubmit(evt) {
     .then((user) => {
       populateUserProfile(user);
       closeModal(evt.target.closest(SELECTORS.popup));
+    })
+    .catch((err) => {
+      console.log(err);
     })
     .finally(() => {
       renderLoading(false, btn);

@@ -4,10 +4,6 @@ export function enableValidation(selectors) {
   );
 
   formList.forEach((formElement) => {
-    formElement.addEventListener("submit", function (evt) {
-      evt.preventDefault();
-    });
-
     setEventListeners(formElement, selectors);
   });
 }
@@ -49,8 +45,10 @@ const setEventListeners = (formElement, selectors) => {
 function toggleButtonState(inputList, buttonElement, selectors) {
   if (hasInvalidInput(inputList)) {
     buttonElement.classList.add(selectors.inactiveButtonClass);
+    buttonElement.disabled = true;
   } else {
     buttonElement.classList.remove(selectors.inactiveButtonClass);
+    buttonElement.disabled = false;
   }
 }
 

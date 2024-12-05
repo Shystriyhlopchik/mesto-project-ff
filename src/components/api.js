@@ -6,13 +6,13 @@ const config = {
   },
 };
 
-async function get(url) {
+function get(url) {
   return fetch(config.baseUrl + `/${url}`, {
     headers: config.headers,
   });
 }
 
-async function patch(url, params) {
+function patch(url, params) {
   return fetch(config.baseUrl + `/${url}`, {
     method: "PATCH",
     headers: config.headers,
@@ -20,7 +20,7 @@ async function patch(url, params) {
   });
 }
 
-async function post(url, params) {
+function post(url, params) {
   return fetch(config.baseUrl + `/${url}`, {
     method: "POST",
     headers: config.headers,
@@ -28,14 +28,14 @@ async function post(url, params) {
   });
 }
 
-async function dlt(url, cardId) {
+function dlt(url, cardId) {
   return fetch(config.baseUrl + `/${url}/${cardId}`, {
     method: "DELETE",
     headers: config.headers,
   });
 }
 
-async function put(url, cardId) {
+function put(url, cardId) {
   return fetch(config.baseUrl + `/${url}/${cardId}`, {
     method: "PUT",
     headers: config.headers,
@@ -46,18 +46,10 @@ async function put(url, cardId) {
  * Функция получения списка карточек
  * @return { Promise }
  */
-export async function getListCards() {
-  return get("cards")
-    .then((res) => {
-      if (res.ok) {
-        return res.json();
-      }
-
-      return Promise.reject(`Ошибка: ${res.status}`);
-    })
-    .catch((err) => {
-      console.log(err);
-    });
+export function getListCards() {
+  return get("cards").then((res) => {
+    return getResponseData(res);
+  });
 }
 
 /**
@@ -65,17 +57,9 @@ export async function getListCards() {
  * @return { Promise }
  */
 export function getUserInformation() {
-  return get("users/me")
-    .then((res) => {
-      if (res.ok) {
-        return res.json();
-      }
-
-      return Promise.reject(`Ошибка: ${res.status}`);
-    })
-    .catch((err) => {
-      console.log(err);
-    });
+  return get("users/me").then((res) => {
+    return getResponseData(res);
+  });
 }
 
 /**
@@ -84,20 +68,12 @@ export function getUserInformation() {
  * @param { string } job Занятия пользователя
  * @return { Promise }
  */
-export async function updateUserProfile(name, job) {
+export function updateUserProfile(name, job) {
   const params = { name, about: job };
 
-  return patch("users/me", params)
-    .then((res) => {
-      if (res.ok) {
-        return res.json();
-      }
-
-      return Promise.reject(`Ошибка: ${res.status}`);
-    })
-    .catch((err) => {
-      console.log(err);
-    });
+  return patch("users/me", params).then((res) => {
+    return getResponseData(res);
+  });
 }
 
 /**
@@ -106,20 +82,12 @@ export async function updateUserProfile(name, job) {
  * @param { string } link Ссылка на изображение
  * @return { Promise }
  */
-export async function addNewCard(name, link) {
+export function addNewCard(name, link) {
   const params = { name, link };
 
-  return post("cards", params)
-    .then((res) => {
-      if (res.ok) {
-        return res.json();
-      }
-
-      return Promise.reject(`Ошибка: ${res.status}`);
-    })
-    .catch((err) => {
-      console.log(err);
-    });
+  return post("cards", params).then((res) => {
+    return getResponseData(res);
+  });
 }
 
 /**
@@ -127,17 +95,9 @@ export async function addNewCard(name, link) {
  * @param { number } cardId ID удаляемой карточки
  */
 export function deleteCard(cardId) {
-  dlt("cards", cardId)
-    .then((res) => {
-      if (res.ok) {
-        return res.json();
-      }
-
-      return Promise.reject(`Ошибка: ${res.status}`);
-    })
-    .catch((err) => {
-      console.log(err);
-    });
+  return dlt("cards", cardId).then((res) => {
+    return getResponseData(res);
+  });
 }
 
 /**
@@ -145,18 +105,10 @@ export function deleteCard(cardId) {
  * @param { number } cardId ID карточки
  * @return { Promise }
  */
-export async function addLikeCard(cardId) {
-  return put("cards/likes/", cardId)
-    .then((res) => {
-      if (res.ok) {
-        return res.json();
-      }
-
-      return Promise.reject(`Ошибка: ${res.status}`);
-    })
-    .catch((err) => {
-      console.log(err);
-    });
+export function addLikeCard(cardId) {
+  return put("cards/likes/", cardId).then((res) => {
+    return getResponseData(res);
+  });
 }
 
 /**
@@ -164,18 +116,10 @@ export async function addLikeCard(cardId) {
  * @param { number } cardId ID карточки
  * @return { Promise }
  */
-export async function removeLikeCard(cardId) {
-  return dlt("cards/likes/", cardId)
-    .then((res) => {
-      if (res.ok) {
-        return res.json();
-      }
-
-      return Promise.reject(`Ошибка: ${res.status}`);
-    })
-    .catch((err) => {
-      console.log(err);
-    });
+export function removeLikeCard(cardId) {
+  return dlt("cards/likes/", cardId).then((res) => {
+    return getResponseData(res);
+  });
 }
 
 /**
@@ -183,18 +127,17 @@ export async function removeLikeCard(cardId) {
  * @param { string } avatar ссылка на аватар пользователя
  * @return { Promise }
  */
-export async function updateAvatar(avatar) {
+export function updateAvatar(avatar) {
   const params = { avatar };
 
-  return patch("users/me/avatar", params)
-    .then((res) => {
-      if (res.ok) {
-        return res.json();
-      }
+  return patch("users/me/avatar", params).then((res) => {
+    return getResponseData(res);
+  });
+}
 
-      return Promise.reject(`Ошибка: ${res.status}`);
-    })
-    .catch((err) => {
-      console.log(err);
-    });
+function getResponseData(res) {
+  if (!res.ok) {
+    return Promise.reject(`Ошибка: ${res.status}`);
+  }
+  return res.json();
 }
