@@ -1,3 +1,5 @@
+import { clearValidation } from "./validation";
+
 export function openModal(modal) {
   modal.classList.add("popup_is-opened");
   document.addEventListener("keydown", closeByEscape);
@@ -9,7 +11,7 @@ export function closeModal(modal) {
 }
 
 function closeByEscape(event) {
-  if(event.key === 'Escape') {
-     closeModal(document.querySelector('.popup_is-opened'));
+  if (event.key === "Escape") {
+    closeModal(document.querySelector(".popup_is-opened"));
   }
 }

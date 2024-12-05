@@ -1,7 +1,14 @@
-import { initialCards } from "./cards";
 import "../pages/index.css";
 import { createCard, removeCard, likeCard } from "../components/card";
 import { closeModal, openModal } from "../components/modal";
+import { clearValidation, enableValidation } from "../components/validation";
+import {
+  addNewCard,
+  getListCards,
+  getUserInformation,
+  updateAvatar,
+  updateUserProfile,
+} from "../components/api";
 
 const SELECTORS = {
   editButton: ".profile__edit-button",
@@ -17,25 +24,22 @@ const SELECTORS = {
   popupTypeImage: ".popup_type_image",
   pageContent: ".page__content",
   profileTitle: ".profile__title",
-  profileDescription: ".profile__description"
+  profileDescription: ".profile__description",
+  profileImage: ".profile__image",
+  popupAvatar: ".popup_type_avatar",
+  popupButton: ".popup__button",
+};
+
+const settings = {
+  formSelector: ".popup__form",
+  inputSelector: ".popup__input",
+  submitButtonSelector: ".popup__button",
+  inactiveButtonClass: "popup__button_disabled",
+  inputErrorClass: "popup__input_type_error",
+  errorClass: "popup__error_visible",
 };
 
 const actionMap = [
-  {
-    selector: SELECTORS.editButton,
-    action: () => {
-      populateEditProfileForm();
-      openModal(popupEdit);
-    },
-  },
-  {
-    selector: SELECTORS.addButton,
-    action: () => openModal(popupNewCard),
-  },
-  {
-    selector: SELECTORS.cardImage,
-    action: () => openModal(popupImage),
-  },
   {
     selector: SELECTORS.closeButton,
     action: (target) => {
@@ -54,6 +58,7 @@ const actionMap = [
 // @todo: Формы
 const editProfileForm = document.forms["edit-profile"];
 const newPlaceForm = document.forms["new-place"];
+const editAvatarForm = document.forms["edit-avatar"];
 
 // @todo: DOM узлы
 const placesList = document.querySelector(SELECTORS.placesList);
@@ -63,18 +68,31 @@ const popupImage = document.querySelector(SELECTORS.popupTypeImage);
 const pageContent = document.querySelector(SELECTORS.pageContent);
 const nameElement = document.querySelector(SELECTORS.profileTitle);
 const lessonsElement = document.querySelector(SELECTORS.profileDescription);
+const imgElement = document.querySelector(SELECTORS.profileImage);
+const profileEditBtn = document.querySelector(SELECTORS.editButton);
+const addBtn = document.querySelector(SELECTORS.addButton);
+const popupAvatar = document.querySelector(SELECTORS.popupAvatar);
 
 // @todo: Вывести карточки на страницу
 const fragment = document.createDocumentFragment();
 
-initialCards.forEach((card) => {
-  const newCard = createCard(card, removeCard, likeCard, viewImg);
-  fragment.appendChild(newCard);
-});
+Promise.all([getListCards(), getUserInformation()])
+  .then(([cards, user]) => {
+    const userId = user["_id"];
 
-placesList.appendChild(fragment);
+    cards.forEach((card) => {
+      const newCard = createCard(card, removeCard, likeCard, viewImg, userId);
+      fragment.appendChild(newCard);
+    });
 
-// @todo: прослушивание событий
+    return { fragment, user };
+  })
+  .then(({ fragment, user }) => {
+    populateUserProfile(user);
+    placesList.appendChild(fragment);
+  });
+
+// @todo: прослушивание событий(отвечает исключительно за закрытие)
 pageContent.addEventListener("click", (evt) => {
   const target = evt.target;
   const actionObj = actionMap.find((item) => {
@@ -86,66 +104,123 @@ pageContent.addEventListener("click", (evt) => {
   }
 });
 
+// @todo: Прослушивание клика по кнопке редактирования пользователя
+profileEditBtn.addEventListener("click", () => {
+  populateEditProfileForm();
+  clearValidation(popupEdit, settings);
+  openModal(popupEdit, settings);
+});
+
+// @todo: Прослушивание клика по добавлению новой карточки
+addBtn.addEventListener("click", () => {
+  openModal(popupNewCard, settings);
+});
+
+imgElement.addEventListener("click", () => {
+  clearValidation(popupAvatar, settings);
+  editAvatarForm.reset();
+  openModal(popupAvatar, settings);
+});
+
 newPlaceForm.addEventListener("submit", handlePlaceFormSubmit);
+editAvatarForm.addEventListener("submit", handleAvatarFormSubmit);
 
 function viewImg(event, data) {
   const cardImage = document.querySelector(SELECTORS.popupImg);
   const popupCaption = document.querySelector(SELECTORS.popupCaption);
 
-  const actionItem = actionMap.find((item) => {
-    return item.selector === SELECTORS.cardImage;
-  });
-
   cardImage.setAttribute("src", data.link);
   popupCaption.textContent = data.name;
-
-  actionItem.action();
+  openModal(popupImage, settings);
 }
-
-function handleProfileFormSubmit(evt) {
-  const formElement = document.querySelector(".popup__form");
-  const nameElement = document.querySelector(".profile__title");
-  const lessonsElement = document.querySelector(".profile__description");
-  const nameInput = formElement.querySelector(".popup__input_type_name");
-  const jobInput = formElement.querySelector(".popup__input_type_description");
-
-  evt.preventDefault();
-
-  const nameValue = nameInput.value;
-  const jobValue = jobInput.value;
-
-  nameElement.textContent = nameValue;
-  lessonsElement.textContent = jobValue;
-
-  closeModal(evt.target.closest(SELECTORS.popup));
-}
-
 
 function populateEditProfileForm() {
-  editProfileForm.name.value = nameElement.textContent; 
+  editProfileForm.name.value = nameElement.textContent;
   editProfileForm.description.value = lessonsElement.textContent;
 
   editProfileForm.addEventListener("submit", handleProfileFormSubmit);
 }
 
+function handleProfileFormSubmit(evt) {
+  console.log(evt.target);
+  const formElement = document.querySelector(".popup__form");
+  const nameElement = document.querySelector(".profile__title");
+  const lessonsElement = document.querySelector(".profile__description");
+  const nameInput = formElement.querySelector(".popup__input_type_name");
+  const jobInput = formElement.querySelector(".popup__input_type_description");
+  const btn = evt.target.querySelector(SELECTORS.popupButton);
+
+  evt.preventDefault();
+
+  renderLoading(true, btn);
+
+  const nameValue = nameInput.value;
+  const jobValue = jobInput.value;
+
+  updateUserProfile(nameValue, jobValue)
+    .then(() => {
+      nameElement.textContent = nameValue;
+      lessonsElement.textContent = jobValue;
+    })
+    .finally(() => {
+      renderLoading(false, btn);
+      closeModal(evt.target.closest(SELECTORS.popup));
+    });
+}
+
 function handlePlaceFormSubmit(evt) {
   evt.preventDefault();
+
+  const btn = evt.target.querySelector(SELECTORS.popupButton);
   const placeNameVal = newPlaceForm["place-name"].value;
   const linkVal = newPlaceForm["link"].value;
 
-  const newCard = createCard(
-    {
-      name: placeNameVal,
-      link: linkVal,
-    },
-    removeCard,
-    likeCard,
-    viewImg,
-  );
+  renderLoading(true, btn);
+  addNewCard(placeNameVal, linkVal)
+    .then(() => {
+      const newCard = createCard(
+        {
+          name: placeNameVal,
+          link: linkVal,
+        },
+        removeCard,
+        likeCard,
+        viewImg,
+      );
 
-  const placesList = document.querySelector(".places__list");
-  placesList.insertBefore(newCard, placesList.firstChild);
+      const placesList = document.querySelector(".places__list");
 
-  newPlaceForm.reset();
-  closeModal(evt.target.closest(SELECTORS.popup));
+      placesList.insertBefore(newCard, placesList.firstChild);
+      newPlaceForm.reset();
+    })
+    .finally(() => {
+      renderLoading(false, btn);
+      closeModal(evt.target.closest(SELECTORS.popup));
+    });
 }
+
+function handleAvatarFormSubmit(evt) {
+  const btn = evt.target.querySelector(SELECTORS.popupButton);
+  const urlAvatar = editAvatarForm["link"].value;
+
+  updateAvatar(urlAvatar)
+    .then((user) => {
+      populateUserProfile(user);
+      closeModal(evt.target.closest(SELECTORS.popup));
+    })
+    .finally(() => {
+      renderLoading(false, btn);
+    });
+}
+
+function populateUserProfile(user) {
+  nameElement.textContent = user.name;
+  lessonsElement.textContent = user.about;
+  imgElement.style = `background-image: url('${user.avatar}')`;
+}
+
+function renderLoading(isLoading, button) {
+  button.textContent = isLoading ? "Сохранение..." : "Сохранить";
+}
+
+enableValidation(settings);
