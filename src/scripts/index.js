@@ -1,7 +1,11 @@
 import "../pages/index.css";
 import { createCard, removeCard, likeCard } from "../components/card";
 import { closeModal, openModal } from "../components/modal";
-import { clearValidation, enableValidation } from "../components/validation";
+import {
+  clearValidation,
+  deactivateButton,
+  enableValidation,
+} from "../components/validation";
 import {
   addNewCard,
   getListCards,
@@ -55,6 +59,8 @@ const actionMap = [
   },
 ];
 
+let userID = null;
+
 // @todo: Формы
 const editProfileForm = document.forms["edit-profile"];
 const newPlaceForm = document.forms["new-place"];
@@ -83,10 +89,10 @@ const fragment = document.createDocumentFragment();
 
 Promise.all([getListCards(), getUserInformation()])
   .then(([cards, user]) => {
-    const userId = user["_id"];
+    userID = user["_id"];
 
     cards.forEach((card) => {
-      const newCard = createCard(card, removeCard, likeCard, viewImg, userId);
+      const newCard = createCard(card, removeCard, likeCard, viewImg, userID);
       fragment.appendChild(newCard);
     });
 
@@ -152,6 +158,7 @@ function handleProfileFormSubmit(evt) {
   evt.preventDefault();
 
   renderLoading(true, btn);
+  deactivateButton(btn, settings);
 
   const nameValue = nameInput.value;
   const jobValue = jobInput.value;
@@ -178,18 +185,11 @@ function handlePlaceFormSubmit(evt) {
   const linkVal = newPlaceForm["link"].value;
 
   renderLoading(true, btn);
-  addNewCard(placeNameVal, linkVal)
-    .then(() => {
-      const newCard = createCard(
-        {
-          name: placeNameVal,
-          link: linkVal,
-        },
-        removeCard,
-        likeCard,
-        viewImg,
-      );
+  deactivateButton(btn, settings);
 
+  addNewCard(placeNameVal, linkVal)
+    .then((res) => {
+      const newCard = createCard(res, removeCard, likeCard, viewImg, userID);
       const placesList = document.querySelector(".places__list");
 
       placesList.insertBefore(newCard, placesList.firstChild);
@@ -205,8 +205,13 @@ function handlePlaceFormSubmit(evt) {
 }
 
 function handleAvatarFormSubmit(evt) {
+  evt.preventDefault();
+
   const btn = evt.target.querySelector(SELECTORS.popupButton);
   const urlAvatar = editAvatarForm["link"].value;
+
+  renderLoading(true, btn);
+  deactivateButton(btn, settings);
 
   updateAvatar(urlAvatar)
     .then((user) => {

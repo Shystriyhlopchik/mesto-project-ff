@@ -106,7 +106,7 @@ export function deleteCard(cardId) {
  * @return { Promise }
  */
 export function addLikeCard(cardId) {
-  return put("cards/likes/", cardId).then((res) => {
+  return put("cards/likes", cardId).then((res) => {
     return getResponseData(res);
   });
 }
@@ -117,7 +117,7 @@ export function addLikeCard(cardId) {
  * @return { Promise }
  */
 export function removeLikeCard(cardId) {
-  return dlt("cards/likes/", cardId).then((res) => {
+  return dlt("cards/likes", cardId).then((res) => {
     return getResponseData(res);
   });
 }

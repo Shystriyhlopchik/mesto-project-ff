@@ -68,21 +68,24 @@ function getSelectors() {
 export function removeCard(event, cardId) {
   const item = event.target.closest(".places__item");
 
-  deleteCard(cardId).catch((err) => {
-    console.log(err);
-  });
-
-  item.remove();
+  deleteCard(cardId)
+    .then(() => {
+      item.remove();
+    })
+    .catch((err) => {
+      console.log(err);
+    });
 }
 
 export function likeCard(event, cardId, data, cardLikeCount) {
-  const res = event.target.classList.toggle("card__like-button_is-active");
+  const res = event.target.classList.contains("card__like-button_is-active");
 
-  if (res) {
+  if (!res) {
     addLikeCard(cardId)
       .then((res) => {
         data.likes = [...res.likes];
         cardLikeCount.textContent = data.likes.length;
+        event.target.classList.toggle("card__like-button_is-active");
       })
       .catch((err) => {
         console.log(err);
@@ -92,6 +95,7 @@ export function likeCard(event, cardId, data, cardLikeCount) {
       .then((res) => {
         data.likes = [...res.likes];
         cardLikeCount.textContent = data.likes.length;
+        event.target.classList.toggle("card__like-button_is-active");
       })
       .catch((err) => {
         console.log(err);

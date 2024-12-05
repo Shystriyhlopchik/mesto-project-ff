@@ -24,6 +24,11 @@ export function clearValidation(profileForm, validationConfig) {
   toggleButtonState(inputList, buttonElement, validationConfig);
 }
 
+export function deactivateButton(buttonElement, settings) {
+  buttonElement.classList.add(settings.inactiveButtonClass);
+  buttonElement.disabled = true;
+}
+
 const setEventListeners = (formElement, selectors) => {
   const inputList = Array.from(
     formElement.querySelectorAll(selectors.inputSelector),
