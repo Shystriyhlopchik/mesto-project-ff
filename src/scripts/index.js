@@ -167,7 +167,7 @@ function handleProfileFormSubmit(evt) {
     .then((res) => {
       nameElement.textContent = res.name;
       lessonsElement.textContent = res.about;
-      closeModal(evt.target.closest(SELECTORS.popup));
+      closeModal(popupEdit);
     })
     .catch((err) => {
       console.log(err);
@@ -193,7 +193,7 @@ function handlePlaceFormSubmit(evt) {
       const placesList = document.querySelector(".places__list");
 
       placesList.insertBefore(newCard, placesList.firstChild);
-      closeModal(evt.target.closest(SELECTORS.popup));
+      closeModal(popupNewCard);
       newPlaceForm.reset();
     })
     .catch((err) => {
@@ -216,7 +216,7 @@ function handleAvatarFormSubmit(evt) {
   updateAvatar(urlAvatar)
     .then((user) => {
       populateUserProfile(user);
-      closeModal(evt.target.closest(SELECTORS.popup));
+      closeModal(popupAvatar);
     })
     .catch((err) => {
       console.log(err);
