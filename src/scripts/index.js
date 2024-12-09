@@ -32,6 +32,8 @@ const SELECTORS = {
   profileImage: ".profile__image",
   popupAvatar: ".popup_type_avatar",
   popupButton: ".popup__button",
+  popupInputTypeName: ".popup__input_type_name",
+  popupInputTypeDescription: ".popup__input_type_description",
 };
 
 const settings = {
@@ -43,22 +45,6 @@ const settings = {
   errorClass: "popup__error_visible",
 };
 
-const actionMap = [
-  {
-    selector: SELECTORS.closeButton,
-    action: (target) => {
-      const popup = target.closest(SELECTORS.popup);
-      closeModal(popup);
-    },
-  },
-  {
-    selector: SELECTORS.popup,
-    action: (target) => {
-      closeModal(target);
-    },
-  },
-];
-
 let userID = null;
 
 // @todo: Формы
@@ -68,21 +54,21 @@ const editAvatarForm = document.forms["edit-avatar"];
 
 // @todo: DOM узлы
 const placesList = document.querySelector(SELECTORS.placesList);
-const popupEdit = document.querySelector(SELECTORS.popupTypeEdit);
 const popupNewCard = document.querySelector(SELECTORS.popupTypeNewCard);
 const popupImage = document.querySelector(SELECTORS.popupTypeImage);
-const pageContent = document.querySelector(SELECTORS.pageContent);
 const nameElement = document.querySelector(SELECTORS.profileTitle);
 const lessonsElement = document.querySelector(SELECTORS.profileDescription);
 const imgElement = document.querySelector(SELECTORS.profileImage);
 const profileEditBtn = document.querySelector(SELECTORS.editButton);
 const addBtn = document.querySelector(SELECTORS.addButton);
 const popupAvatar = document.querySelector(SELECTORS.popupAvatar);
+const popupAvatarBtn = popupAvatar.querySelector(SELECTORS.popupButton);
 const cardImage = document.querySelector(SELECTORS.popupImg);
 const popupCaption = document.querySelector(SELECTORS.popupCaption);
-const formElement = document.querySelector(".popup__form");
-const nameInput = formElement.querySelector(".popup__input_type_name");
-const jobInput = formElement.querySelector(".popup__input_type_description");
+const formElement = document.querySelector(settings.formSelector);
+const nameInput = formElement.querySelector(SELECTORS.popupInputTypeName);
+const jobInput = formElement.querySelector(SELECTORS.popupInputTypeDescription);
+const popupProfileEdit = document.querySelector(SELECTORS.popupTypeEdit);
 
 // @todo: Вывести карточки на страницу
 const fragment = document.createDocumentFragment();
@@ -106,23 +92,11 @@ Promise.all([getListCards(), getUserInformation()])
     console.log(err);
   });
 
-// @todo: прослушивание событий(отвечает исключительно за закрытие)
-pageContent.addEventListener("click", (evt) => {
-  const target = evt.target;
-  const actionObj = actionMap.find((item) => {
-    return target.matches(item.selector);
-  });
-
-  if (actionObj) {
-    actionObj.action(target);
-  }
-});
-
 // @todo: Прослушивание клика по кнопке редактирования пользователя
 profileEditBtn.addEventListener("click", () => {
   populateEditProfileForm();
-  clearValidation(popupEdit, settings);
-  openModal(popupEdit, settings);
+  clearValidation(popupProfileEdit, settings);
+  openModal(popupProfileEdit, settings);
 });
 
 // @todo: Прослушивание клика по добавлению новой карточки
@@ -133,6 +107,7 @@ addBtn.addEventListener("click", () => {
 imgElement.addEventListener("click", () => {
   clearValidation(popupAvatar, settings);
   editAvatarForm.reset();
+  deactivateButton(popupAvatarBtn, settings);
   openModal(popupAvatar, settings);
 });
 
@@ -158,7 +133,6 @@ function handleProfileFormSubmit(evt) {
   evt.preventDefault();
 
   renderLoading(true, btn);
-  deactivateButton(btn, settings);
 
   const nameValue = nameInput.value;
   const jobValue = jobInput.value;
@@ -168,6 +142,7 @@ function handleProfileFormSubmit(evt) {
       nameElement.textContent = res.name;
       lessonsElement.textContent = res.about;
       closeModal(evt.target.closest(SELECTORS.popup));
+      deactivateButton(btn, settings);
     })
     .catch((err) => {
       console.log(err);
@@ -185,16 +160,15 @@ function handlePlaceFormSubmit(evt) {
   const linkVal = newPlaceForm["link"].value;
 
   renderLoading(true, btn);
-  deactivateButton(btn, settings);
 
   addNewCard(placeNameVal, linkVal)
     .then((res) => {
       const newCard = createCard(res, removeCard, likeCard, viewImg, userID);
-      const placesList = document.querySelector(".places__list");
 
       placesList.insertBefore(newCard, placesList.firstChild);
       closeModal(evt.target.closest(SELECTORS.popup));
       newPlaceForm.reset();
+      deactivateButton(btn, settings);
     })
     .catch((err) => {
       console.log(err);
@@ -211,12 +185,12 @@ function handleAvatarFormSubmit(evt) {
   const urlAvatar = editAvatarForm["link"].value;
 
   renderLoading(true, btn);
-  deactivateButton(btn, settings);
 
   updateAvatar(urlAvatar)
     .then((user) => {
       populateUserProfile(user);
       closeModal(evt.target.closest(SELECTORS.popup));
+      deactivateButton(btn, settings);
     })
     .catch((err) => {
       console.log(err);
