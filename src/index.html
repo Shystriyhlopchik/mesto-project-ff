@@ -76,7 +76,7 @@
         <div class="popup__content">
           <button type="button" class="popup__close"></button>
           <h3 class="popup__title">Новое место</h3>
-          <form class="popup__form" name="new-place">
+          <form class="popup__form" name="new-place" novalidate>
             <input
               id="place-name-input"
               type="text"
@@ -97,7 +97,6 @@
               class="popup__input popup__input_type_url"
               placeholder="Ссылка на картинку"
               required
-              pattern="^(https?:\/\/)?([\w\-]+\.)+[\w\-]+(\/[\w\-\.\/?%&=]*)?$"
               data-error-message="Разрешён только URL"
             />
             <span class="popup__error link-input-error"></span>
@@ -135,7 +134,6 @@
               placeholder="Ссылка на картинку"
               id="link-img-input"
               required
-              pattern="^(https?:\/\/)?([\w\-]+\.)+[\w\-]+(\/[\w\-\.\/?%&=#]*)?$"
               data-error-message="Введите URL"
             />
             <span class="popup__error link-img-input-error"></span>

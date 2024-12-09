@@ -141,7 +141,7 @@ function handleProfileFormSubmit(evt) {
     .then((res) => {
       nameElement.textContent = res.name;
       lessonsElement.textContent = res.about;
-      closeModal(evt.target.closest(SELECTORS.popup));
+      closeModal(popupProfileEdit);
       deactivateButton(btn, settings);
     })
     .catch((err) => {
@@ -166,7 +166,7 @@ function handlePlaceFormSubmit(evt) {
       const newCard = createCard(res, removeCard, likeCard, viewImg, userID);
 
       placesList.insertBefore(newCard, placesList.firstChild);
-      closeModal(evt.target.closest(SELECTORS.popup));
+      closeModal(popupNewCard);
       newPlaceForm.reset();
       deactivateButton(btn, settings);
     })
@@ -189,7 +189,7 @@ function handleAvatarFormSubmit(evt) {
   updateAvatar(urlAvatar)
     .then((user) => {
       populateUserProfile(user);
-      closeModal(evt.target.closest(SELECTORS.popup));
+      closeModal(popupAvatar);
       deactivateButton(btn, settings);
     })
     .catch((err) => {
