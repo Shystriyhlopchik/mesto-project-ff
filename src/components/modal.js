@@ -11,7 +11,6 @@ export function closeModal(modal) {
 }
 
 function handlePopupClose(evt) {
-  console.log(evt.target);
   if (evt.target.classList.contains("popup_is-opened")) {
     closeModal(document.querySelector(".popup_is-opened"));
   }
